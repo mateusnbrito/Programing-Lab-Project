@@ -13,6 +13,10 @@ estrPrin emp =
 //variável de Struct para lista
 No *lista = NULL;
 
+FILE *configtxt;
+FILE *arq;
+FILE *arq2;
+
 //Função que cria as estruturas auxiliares.
 int criarEstruturaAuxiliar(int tamanho, int posicao)
 {
@@ -484,12 +488,22 @@ void inicializar()
         c1++;
     }
     c1=0;
+
+    config();
 }
 
 //PENDENTE
 void finalizar()
 {
-    int c1=0, c2=0;
+    int c1=0, c2=0, resp;
+
+    configtxt = fopen("config.txt", "a");
+    configtxt = fopen("config.txt", "r");
+
+    fscanf(configtxt, "%d", &resp);
+
+    if(resp == 1) impListasDeci();
+    if(resp == 2) impListasBin();
 
     while(c1<10)
     {
@@ -530,30 +544,119 @@ void config()
 {
     int resp;
 
-    FILE *config;
+    configtxt = fopen("config.txt", "a");
+    configtxt = fopen("config.txt", "r");
 
-    config = fopen("config.txt", "a");
-    config = fopen("config.txt", "r");
+    fscanf(configtxt, "%d", &resp);
 
-    fscanf(config, "%d", &resp);
+    if(resp == 1)
+    {
+        arq = fopen("dadosDec.txt", "r");
 
-    if(resp == 1) impListasDeci();
-    else if(resp == 2) impListasBin();
+        if(arq != NULL) preEstr();
+    }
+
+    if(resp == 2)
+    {
+        arq2 = fopen("dadosBin.txt", "rb");
+
+        if(arq2 != NULL) preEstr2();
+    }
+}
+
+void preEstr()
+{
+    int c1=0, c2=0, totPosi=0, tam[10], posi[10];
+
+    arq = fopen("dadosDec.txt", "r");
+
+    //Lendo e copiando os tamanhos
+    while(c1<10)
+    {
+        fscanf(arq, "%d", &tam[c1]);
+        if(tam[c1] > 0) p[c1].ptr = (int*) malloc(sizeof(int)*tam[c1]);
+        p[c1].tam = tam[c1];
+        c1++;
+    }
+    c1=0;
+
+    //Lendo e copiando as posicoes
+    while(c1<10)
+    {
+        fscanf(arq, "%d", &posi[c1]);
+        p[c1].posi = posi[c1];
+        totPosi = totPosi + posi[c1];
+        c1++;
+    }
+    c1=0;
+
+    int vetAux[totPosi];
+
+    //Copiar os Componentes das Estruturas
+    while(c1<10)
+    {
+        while(c2 < (p[c1].posi))
+        {
+            fscanf(arq, "%d", &p[c1].ptr[c2]);
+            c2++;
+        }
+        c2=0;
+        c1++;
+    }
+    c1=0;
+}
+
+void preEstr2()
+{
+    int c1=0, c2=0, totPosi=0, tam[10], posi[10];
+
+    arq = fopen("dadosBin.txt", "r");
+
+    //Lendo e copiando os tamanhos
+    while(c1<10)
+    {
+        fscanf(arq2, "%d", &tam[c1]);
+        if(tam[c1] > 0) p[c1].ptr = (int*) malloc(sizeof(int)*tam[c1]);
+        p[c1].tam = tam[c1];
+        c1++;
+    }
+    c1=0;
+
+    //Lendo e copiando as posicoes
+    while(c1<10)
+    {
+        fscanf(arq2, "%d", &posi[c1]);
+        p[c1].posi = posi[c1];
+        totPosi = totPosi + posi[c1];
+        c1++;
+    }
+    c1=0;
+
+    int vetAux[totPosi];
+
+    //Copiar os Componentes das Estruturas
+    while(c1<10)
+    {
+        while(c2 < (p[c1].posi))
+        {
+            fscanf(arq2, "%d", &p[c1].ptr[c2]);
+            c2++;
+        }
+        c2=0;
+        c1++;
+    }
+    c1=0;
 }
 
 void impListasDeci()
 {
-    int c1=0, c2=0, c3=0;
-
-    FILE *arq;
+    int c1=9, c2=0, c3=0;
 
     arq = fopen("dadosDec.txt", "w");
 
-    while(c1<10)
+    while(c1>=0)
     {
         arq = fopen("dadosDec.txt", "a");
-        
-        fprintf(arq, "EP%d: ", c1+1);
 
         while(c2 < p[c1].posi)
         {
@@ -562,26 +665,45 @@ void impListasDeci()
         }
         fprintf(arq, "\n");
         c2=0;
+        c1--;
+    }
+    c1=0;
+
+    arq = fopen("dadosDec.txt", "a");
+
+    while(c1<10)
+    {
+        fprintf(arq, "%d ", p[c1].posi);
         c1++;
     }
     c1=0;
+
+    fprintf(arq, "\n");
+
+    arq = fopen("dadosDec.txt", "a");
+
+    while(c1<10)
+    {
+        fprintf(arq, "%d ", p[c1].tam);
+        c1++;
+    }
+    c1=0;
+
+    fprintf(arq, "\n");
 
     fclose(arq);
 }
 
 void impListasBin()
 {
-    int c1=0, c2=0, c3=0;
+    int c1=9, c2=0, c3=0;
 
-    FILE *arq2;
+    arq2 = fopen("dadosBin.txt", "w");
 
-    arq2 = fopen("dadosBin.txt", "wb");
-
-    while(c1<10)
+    //Impressão dos Componentes
+    while(c1>=0)
     {
-        arq2 = fopen("dadosBin.txt", "ab");
-        
-        fprintf(arq2, "EP%d: ", c1+1);
+        arq2 = fopen("dadosBin.txt", "a");
 
         while(c2 < p[c1].posi)
         {
@@ -590,9 +712,33 @@ void impListasBin()
         }
         fprintf(arq2, "\n");
         c2=0;
+        c1--;
+    }
+    c1=0;
+
+    arq2 = fopen("dadosBin.txt", "a");
+
+    //Impressão das Posições
+    while(c1<10)
+    {
+        fprintf(arq2, "%d ", p[c1].posi);
         c1++;
     }
     c1=0;
+
+    fprintf(arq2, "\n");
+
+    arq2 = fopen("dadosBin.txt", "a");
+
+    //Impressão dos Tamanhos
+    while(c1<10)
+    {
+        fprintf(arq2, "%d ", p[c1].tam);
+        c1++;
+    }
+    c1=0;
+
+    fprintf(arq2, "\n");
 
     fclose(arq2);
 }

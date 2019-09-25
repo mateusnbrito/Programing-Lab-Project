@@ -53,3 +53,5 @@ void dobrar(int *x);
 void config();
 void impListasDeci();
 void impListasBin();
+void preEstr();
+void preEstr2();
