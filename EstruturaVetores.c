@@ -495,7 +495,7 @@ void inicializar()
 //PENDENTE
 void finalizar()
 {
-    int c1=0, c2=0, resp;
+    int c1=0, c2=0, resp, tes=1;
 
     configtxt = fopen("config.txt", "a");
     configtxt = fopen("config.txt", "r");
@@ -553,14 +553,20 @@ void config()
     {
         arq = fopen("dadosDec.txt", "r");
 
-        if(arq != NULL) preEstr();
+        if(arq != NULL)
+        {
+            preEstr();
+        }
     }
 
     if(resp == 2)
     {
         arq2 = fopen("dadosBin.txt", "rb");
 
-        if(arq2 != NULL) preEstr2();
+        if(arq2 != NULL)
+        {
+            preEstr2();
+        }
     }
 }
 
@@ -604,18 +610,20 @@ void preEstr()
         c1++;
     }
     c1=0;
+
+    fclose(arq);
 }
 
 void preEstr2()
 {
     int c1=0, c2=0, totPosi=0, tam[10], posi[10];
 
-    arq = fopen("dadosBin.txt", "r");
+    arq2 = fopen("dadosBin.txt", "rb");
 
     //Lendo e copiando os tamanhos
     while(c1<10)
     {
-        fscanf(arq2, "%d", &tam[c1]);
+        fread(&tam[c1], sizeof(int), 1, arq2);
         if(tam[c1] > 0) p[c1].ptr = (int*) malloc(sizeof(int)*tam[c1]);
         p[c1].tam = tam[c1];
         c1++;
@@ -625,7 +633,7 @@ void preEstr2()
     //Lendo e copiando as posicoes
     while(c1<10)
     {
-        fscanf(arq2, "%d", &posi[c1]);
+        fread(&posi[c1], sizeof(int), 1, arq2);
         p[c1].posi = posi[c1];
         totPosi = totPosi + posi[c1];
         c1++;
@@ -639,49 +647,27 @@ void preEstr2()
     {
         while(c2 < (p[c1].posi))
         {
-            fscanf(arq2, "%d", &p[c1].ptr[c2]);
+            fread(&p[c1].ptr[c2], sizeof(int), 1, arq2);
             c2++;
         }
         c2=0;
         c1++;
     }
     c1=0;
+
+    fclose(arq2);
 }
 
 void impListasDeci()
 {
-    int c1=9, c2=0, c3=0;
+    int c1=0, c2=0, c3=0;
 
     arq = fopen("dadosDec.txt", "w");
-
-    while(c1>=0)
-    {
-        arq = fopen("dadosDec.txt", "a");
-
-        while(c2 < p[c1].posi)
-        {
-            fprintf(arq, "%d ", p[c1].ptr[c2]);
-            c2++;
-        }
-        fprintf(arq, "\n");
-        c2=0;
-        c1--;
-    }
-    c1=0;
+    fclose(arq);
 
     arq = fopen("dadosDec.txt", "a");
 
-    while(c1<10)
-    {
-        fprintf(arq, "%d ", p[c1].posi);
-        c1++;
-    }
-    c1=0;
-
-    fprintf(arq, "\n");
-
-    arq = fopen("dadosDec.txt", "a");
-
+    //Impressão dos Tamanhos
     while(c1<10)
     {
         fprintf(arq, "%d ", p[c1].tam);
@@ -691,54 +677,70 @@ void impListasDeci()
 
     fprintf(arq, "\n");
 
+    //Impressão das Posições
+    while(c1<10)
+    {
+        fprintf(arq, "%d ", p[c1].posi);
+        c1++;
+    }
+    c1=0;
+
+    fprintf(arq, "\n");
+
+    //Impressão dos Dados
+    while(c1<10)
+    {
+        while(c2 < p[c1].posi)
+        {
+            fprintf(arq, "%d ", p[c1].ptr[c2]);
+            c2++;
+        }
+        fprintf(arq, "\n");
+        c2=0;
+        c1++;
+    }
+    c1=0;
+
     fclose(arq);
 }
 
 void impListasBin()
 {
-    int c1=9, c2=0, c3=0;
+    int c1=0, c2=0, c3=0;
 
-    arq2 = fopen("dadosBin.txt", "w");
+    arq2 = fopen("dadosBin.txt", "wb");
+    fclose(arq2);
 
-    //Impressão dos Componentes
-    while(c1>=0)
-    {
-        arq2 = fopen("dadosBin.txt", "a");
-
-        while(c2 < p[c1].posi)
-        {
-            fwrite (&p[c1].ptr[c2], sizeof(int), 1, arq2);
-            c2++;
-        }
-        fprintf(arq2, "\n");
-        c2=0;
-        c1--;
-    }
-    c1=0;
-
-    arq2 = fopen("dadosBin.txt", "a");
-
-    //Impressão das Posições
-    while(c1<10)
-    {
-        fprintf(arq2, "%d ", p[c1].posi);
-        c1++;
-    }
-    c1=0;
-
-    fprintf(arq2, "\n");
-
-    arq2 = fopen("dadosBin.txt", "a");
+    arq2 = fopen("dadosBin.txt", "ab");
 
     //Impressão dos Tamanhos
     while(c1<10)
     {
-        fprintf(arq2, "%d ", p[c1].tam);
+        fwrite(&p[c1].tam, sizeof(int), 1, arq2);
         c1++;
     }
     c1=0;
 
-    fprintf(arq2, "\n");
+    //Impressão das Posições
+    while(c1<10)
+    {
+        fwrite(&p[c1].posi, sizeof(int), 1, arq2);
+        c1++;
+    }
+    c1=0;
+
+    //Impressão dos Dados
+    while(c1<10)
+    {
+        while(c2 < p[c1].posi)
+        {
+            fwrite(&p[c1].ptr[c2], sizeof(int), 1, arq2);
+            c2++;
+        }
+        c2=0;
+        c1++;
+    }
+    c1=0;
 
     fclose(arq2);
 }
